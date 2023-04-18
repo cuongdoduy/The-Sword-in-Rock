@@ -2,14 +2,12 @@
 
 /* * * BEGIN implementation of class BaseBag * * */
 // Class PaladinBag
-
 PaladinBag::PaladinBag(int phoenixdownI,int antidote)
 {
         this->Limit=999999;
         InitialBaseBag(phoenixdownI,antidote);
 }
 // End of class PaladinBag
-
 // Class LancelotBag
 LancelotBag::LancelotBag(int phoenixdownI,int antidote)
 {
@@ -17,15 +15,13 @@ LancelotBag::LancelotBag(int phoenixdownI,int antidote)
         InitialBaseBag(phoenixdownI,antidote);
 }
 // End of class LancelotBag
-
 // Class DragonBag
 DragonBag::DragonBag(int phoenixdownI,int antidote)
 {
         this->Limit=14;
-        InitialBaseBag(phoenixdownI,antidote);
+        InitialBaseBag(phoenixdownI,0);
 }
 // End of class DragonBag
-
 // Class NormalBag
 NormalBag::NormalBag(int phoenixdownI,int antidote)
 {
@@ -34,7 +30,6 @@ NormalBag::NormalBag(int phoenixdownI,int antidote)
 }
 // End of class NormalBag
 /* * * END implementation of class BaseBag * * */
-
 /*** Begin implementation of class BaseOpponent ***/
 // Class BaseOpponent
 void BaseOpponent::fight(BaseKnight *knight)
@@ -55,7 +50,6 @@ void BaseOpponent::win(BaseKnight *knight)
 {
     knight->setHP(knight->getHP()-baseDamage*(levelO-knight->getLevel()));
 }
-
 // Class MadBear;
 // End of class MadBear
 // Class Bandit
@@ -118,6 +112,7 @@ void DurianGarden::fight(BaseKnight * knight)
 // End of class DurianGarden
 void OmegaWeapon::fight(BaseKnight * knight)
 {
+    if (knight->meetOmegaWeapon) return;
     if((knight->getHP()==knight->getmaxHP()&&(knight->getLevel()==10))||(knight->getKnightType()==2)) this->lose(knight); 
     else this->win(knight);
 } 
@@ -125,6 +120,7 @@ void OmegaWeapon::lose(BaseKnight *knight)
 {
     knight->setLevel(10);
     knight->setGil(999);
+    knight->meetOmegaWeapon=true;
 }
 void OmegaWeapon::win(BaseKnight *knight)
 {
@@ -133,6 +129,7 @@ void OmegaWeapon::win(BaseKnight *knight)
 // End of class OmegaWeapon
 void Hades::fight(BaseKnight * knight)
 {
+    if (knight->meetHades) return;
     if((knight->getLevel()==10)||((knight->getKnightType()==0)&&(knight->getLevel()>=8))) this->lose(knight); 
     else this->win(knight);
 } 
@@ -148,6 +145,8 @@ void Hades::win(BaseKnight *knight)
 // End of class Hades
 void Ultimecia::fight(BaseKnight * knight)
 {
+    
+    // cout<<knight->toString()<<endl;
     if (knight->army_excalibur) return this->lose(knight);
     if (knight->army_guinevererHair&&knight->army_lancelotSpear&&knight->army_paladinShied)
     {
@@ -155,22 +154,23 @@ void Ultimecia::fight(BaseKnight * knight)
         {
             if(knight->getKnightType()==0)
             {
-                int dam=(int)0.06*knight->getHP()*knight->getLevel()/1;
+                int dam=int (0.06*knight->getHP()*knight->getLevel()/1);
                 HP-=dam;
             }
             if(knight->getKnightType()==1)
             {
-                int dam=(int)0.05*knight->getHP()*knight->getLevel()/1;
+                int dam=int(0.05*knight->getHP()*knight->getLevel()/1);
                 HP-=dam;
             }
             if(knight->getKnightType()==2)
             {
-                int dam=(int)0.075*knight->getHP()*knight->getLevel()/1;
+                int dam=int(0.075*knight->getHP()*knight->getLevel()/1);
                 HP-=dam;
             }
-            if (HP<=0) this->win(knight); else knight->lose=true;
+            if (HP<=0) this->lose(knight); else knight->lose=true;
+            // cout<<"HP of boss"<<HP<<endl;
         }
-        else knight->lose=true;
+        else this->win(knight);
     }
     else this->win(knight);
 } 
@@ -188,6 +188,7 @@ void Ultimecia::win(BaseKnight *knight)
 /* * * BEGIN implementation of class BaseKnight * * */
 bool isPytago(int);
 bool isPrime(int);
+void passing(BaseKnight **,int );
 KnightType checkingtype(int HP)
 {
     if (isPrime(HP)) return PALADIN;
@@ -224,6 +225,8 @@ ArmyKnights::ArmyKnights(const string & file_armyknights)
     LancelotSpear=false;
     Excalibur=false;
     meetHades=false;
+    meetOmegaWeapon=false;
+    sortArmy=false;
     int maxhp,level,gil,antidote,phoenixdownI;
     ifstream File(file_armyknights);
     File>>N;
@@ -245,156 +248,212 @@ void CheckingBag(BaseKnight **arr,int N,BaseItem *items)
         if (arr[N]->getBag()->getNumberofItems()<arr[N]->getBag()->getLimit()) 
         {
             arr[N]->getBag()->insertFirst(items);
+            // cout<<N<<"-"<<arr[N]->getBag()->toString()<<endl;
             return;
+            
         }
         else N--;
     }
 }
+void ArmyKnights::sortArmyKnight()
+{
+    BaseKnight ** newArmy= new BaseKnight*[N+1];
+    int count=0;
+    for(int i=N;i>=1;i--)
+    {
+        KnightType type=armyKnight[i]->getKnightType();
+        if(type==0||type==1||type==2)
+        {
+            count++;
+        }
+    }
+    int begin=N-count;
+    int end=N;
+    for(int i=N;i>=1;i--)
+    {
+        KnightType type=armyKnight[i]->getKnightType();
+        if(type==0||type==1||type==2)
+        {
+            newArmy[end]=armyKnight[i];
+            end--;
+        }
+        else
+        {
+            newArmy[begin]=armyKnight[i];
+            begin--;
+        }
+    }
+    for(int i=N;i>=1;i--)
+    {
+        armyKnight[i]=newArmy[i];
+        // cout<<armyKnight[i]->toString()<<endl;
+    }   
+    delete newArmy;
+}
 bool ArmyKnights::adventure (Events * events)
 {
     int i=0;
+    int IdEnemy=-99;
+    int prevState=-99;
+    BaseOpponent *opponent;
     while(i<events->count())
     {  
-        BaseOpponent *opponent=NULL;
-        int IdEnemy=events->get(i);
-        switch (IdEnemy)
-        {
-        case 1:
-        {
-            opponent=new MadBear(i,IdEnemy);
-            break;
-        }
-        case 2:
-        {
-            opponent=new Bandit(i,IdEnemy);
-            break;
-        }
-        case 3:
-        {
-            opponent=new LordLupin(i,IdEnemy);
-            break;
-        }
-        case 4:
-        {
-            opponent=new Elf(i,IdEnemy);
-            break;
-        }
-        case 5:
-        {
-            opponent=new Troll(i,IdEnemy);
-            break;
-        }
-        case 6:
-        {
-            opponent=new Tornbery(i,IdEnemy);
-            break;
-        }
-        case 7:
-        {
-            opponent=new QueenOfCards(i,IdEnemy);
-            break;
-        }
-        case 8:
-        {
-            opponent=new NinadeRings(i,IdEnemy);
-            break;
-        }
-        case 9:
-        {
-            opponent=new DurianGarden(i,IdEnemy);
-            break;
-        }
-        case 10:
-        {
-            opponent=new OmegaWeapon(i,IdEnemy);
-            break;
-        }
-        case 11:
-        {
-            opponent=new Hades;
-            break;
-        }
-        case 95:
-        {
-            this->PaladinShied=true;
-            break;
-        }
-        case 96:
-        {
-            this->LancelotSpear=true;
-            break;
-        }
-        case 97:
-        {
-            this->GuinevereHair=true;
-            break;
-        }
-        case 98:
-        {
-            if (this->PaladinShied&&this->LancelotSpear&&this->GuinevereHair) this->Excalibur=true;
-            break;
-        }
-        case 99:
-        {
-            opponent=new Ultimecia;
-            break;
-        }
-        case 112:
-        {
-            BaseItem *item=new PhoenixdownII(PHOENIXDOWN);
-            CheckingBag(armyKnight,N,item);
-            break;
-        }
-        case 113:
-        {
-            BaseItem *item=new PhoenixdownIII(PHOENIXDOWN);
-            CheckingBag(armyKnight,N,item);
-            break;
-        }
-        case 114:
-        {
-            BaseItem *item=new PhoenixdownIV(PHOENIXDOWN);
-            this->lastKnight()->getBag()->insertFirst(item);
-            CheckingBag(armyKnight,N,item);
-            break;
-        }
-        default:
-            break;
-        }
         if (N==0)
         {
-            //   cout<<endl<<"ok"<<endl;
             printInfo();
             printResult(false);
             return false;
         }
+        if (prevState!=i)
+        {
+            opponent=NULL;
+            IdEnemy=events->get(i);
+            switch (IdEnemy)
+            {
+            case 1:
+            {
+                opponent=new MadBear(i,IdEnemy);
+                break;
+            }
+            case 2:
+            {
+                opponent=new Bandit(i,IdEnemy);
+                break;
+            }
+            case 3:
+            {
+                opponent=new LordLupin(i,IdEnemy);
+                break;
+            }
+            case 4:
+            {
+                opponent=new Elf(i,IdEnemy);
+                break;
+            }
+            case 5:
+            {
+                opponent=new Troll(i,IdEnemy);
+                break;
+            }
+            case 6:
+            {
+                opponent=new Tornbery(i,IdEnemy);
+                break;
+            }
+            case 7:
+            {
+                opponent=new QueenOfCards(i,IdEnemy);
+                break;
+            }
+            case 8:
+            {
+                opponent=new NinadeRings(i,IdEnemy);
+                break;
+            }
+            case 9:
+            {
+                opponent=new DurianGarden(i,IdEnemy);
+                break;
+            }
+            case 10:
+            {
+                opponent=new OmegaWeapon(i,IdEnemy);
+                break;
+            }
+            case 11:
+            {
+                opponent=new Hades;
+                break;
+            }
+            case 95:
+            {
+                this->PaladinShied=true;
+                break;
+            }
+            case 96:
+            {
+                this->LancelotSpear=true;
+                break;
+            }
+            case 97:
+            {
+                this->GuinevereHair=true;
+                break;
+            }
+            case 98:
+            {
+                if (this->PaladinShied&&this->LancelotSpear&&this->GuinevereHair) this->Excalibur=true;
+                break;
+            }
+            case 99:
+            {
+                opponent=new Ultimecia;
+                break;
+            }
+            case 112:
+            {
+                BaseItem *item=new PhoenixdownII(PHOENIXDOWN);
+                CheckingBag(armyKnight,N,item);
+                break;
+            }
+            case 113:
+            {
+                BaseItem *item=new PhoenixdownIII(PHOENIXDOWN);
+                CheckingBag(armyKnight,N,item);
+                break;
+            }
+            case 114:
+            {
+                BaseItem *item=new PhoenixdownIV(PHOENIXDOWN);
+                this->lastKnight()->getBag()->insertFirst(item);
+                CheckingBag(armyKnight,N,item);
+                break;
+            }
+            default:
+                break;
+            }
+            prevState=i;
+        }
         if (opponent!=NULL)
         {
-            bool check=this->fight(opponent);
-            if (check==true)   
+            if (IdEnemy==99&&sortArmy==false)
+            {
+                sortArmyKnight();
+                sortArmy=true;
+            }
+            bool KnightLose=this->fight(opponent);
+            if (KnightLose==true)   
             {
                 if(this->lastKnight()->army_loseUltimecia==1) 
                 {
                     N=0;
                 }
-                if (IdEnemy==99)
-                {
-                    while(this->lastKnight()->getKnightType()==3&&N!=0)
-                    {
-                        N--;
-                        if (N==0) break;
-                    }
-                } 
                 else N--;
             }  
             else 
             {
-                printInfo();
-                i++;
                 if (this->lastKnight()->army_loseUltimecia==0)
                 {
+                    BaseKnight *knight;
+                    for (int i = N; i >= 2; i--){
+                        for (int j = 1; j < i; j++)
+                        {
+                            if(armyKnight[j]->getId()>armyKnight[j+1]->getId())
+                            {
+                                knight=armyKnight[i];
+                                armyKnight[i]=armyKnight[j];
+                                armyKnight[j]=knight;
+                            }
+                        }
+                    }                      
+                    delete knight;      
+                    printInfo();
                     printResult(true);
+                    return true;
                 }
+                printInfo();
+                i++;
+                
             }
         }
         else 
@@ -405,19 +464,6 @@ bool ArmyKnights::adventure (Events * events)
     }
     return false;
 }
-void passing(BaseKnight **arr,int N)
-{
-    int remainGil=arr[N]->getGil()-999;
-    arr[N]->setGil(999);
-    int k=N;
-    while(remainGil>0&&k>1)
-    {
-        k--;
-        arr[k]->setGil(arr[k]->getGil()+remainGil);
-        remainGil=arr[k]->getGil()-999;
-        if(k==1&&arr[1]->getGil()>999) arr[1]->setGil(999);
-    }
-}
 bool ArmyKnights::fight(BaseOpponent* opponent)
 {
     this->lastKnight()->army_excalibur=this->Excalibur;
@@ -425,6 +471,7 @@ bool ArmyKnights::fight(BaseOpponent* opponent)
     this->lastKnight()->army_lancelotSpear=this->LancelotSpear;
     this->lastKnight()->army_paladinShied=this->PaladinShied;
     this->lastKnight()->meetHades=this->meetHades;
+    this->lastKnight()->meetOmegaWeapon=this->meetOmegaWeapon;
     opponent->fight(this->lastKnight());
     this->recoveryLastKnight(this->lastKnight());
     if (this->lastKnight()->getHP()<=0||this->lastKnight()->lose==true) return true; else
@@ -435,21 +482,22 @@ bool ArmyKnights::fight(BaseOpponent* opponent)
         this->LancelotSpear=this->lastKnight()->army_lancelotSpear;
         this->PaladinShied=this->lastKnight()->army_paladinShied;
         this->meetHades=this->lastKnight()->meetHades;
+        this->meetOmegaWeapon=this->lastKnight()->meetOmegaWeapon;
         return false;
     }
 }
 void ArmyKnights::recoveryLastKnight(BaseKnight* knight)
 {
-        BaseItem *item=knight->getBag()->getItem(knight);
-        if (item!=NULL)
-        {
-            item->use(knight);
-        }
-        else if((knight->getGil()>=100)&&(knight->getHP()<=0))
-        {
-                knight->setGil(knight->getGil()-100);
-                knight->setHP(knight->getmaxHP()/2);
-        }
+    BaseItem *item=knight->getBag()->getItem(knight);
+    if (item!=NULL)
+    {
+        item->use(knight);
+    }
+    else if((knight->getGil()>=100)&&(knight->getHP()<=0))
+    {
+            knight->setGil(knight->getGil()-100);
+            knight->setHP(knight->getmaxHP()/2);
+    }
 }
 void ArmyKnights::printInfo() const {
     cout << "No. knights: " << this->count();
@@ -554,7 +602,6 @@ string PhoenixdownII::getName()
 {
     return "PhoenixII";
 }
-
 bool PhoenixdownIII::canUse(BaseKnight *knight)
 {
     int HP=knight->getHP();
@@ -569,7 +616,6 @@ string PhoenixdownIII::getName()
 {
     return "PhoenixIII";
 }
-
 bool PhoenixdownIV::canUse(BaseKnight *knight)
 {
     int HP=knight->getHP();
@@ -604,4 +650,17 @@ bool isPrime(int n)
     for(int i=2;i<n/2+1;i++)
     if (n%i==0) return false;
     return true;
+}
+void passing(BaseKnight **arr,int N)
+{
+    int remainGil=arr[N]->getGil()-999;
+    arr[N]->setGil(999);
+    int k=N;
+    while(remainGil>0&&k>1)
+    {
+        k--;
+        arr[k]->setGil(arr[k]->getGil()+remainGil);
+        remainGil=arr[k]->getGil()-999;
+        if(k==1&&arr[1]->getGil()>999) arr[1]->setGil(999);
+    }
 }

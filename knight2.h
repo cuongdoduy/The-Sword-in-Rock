@@ -377,22 +377,12 @@ class Ultimecia:public BaseOpponent
 // End Define Base Opponent
 class BaseKnight {
     protected:
-    int id;
-    int hp; 
-    int maxhp;
-    int level;
-    int gil;
-    int antidote;
+    int id,hp,maxhp,level,gil,antidote;
     BaseBag * bag;
     KnightType knightType;
     public:
-    bool lose;
-    bool army_paladinShied;
-    bool army_guinevererHair;
-    bool army_excalibur;
-    bool army_lancelotSpear;
+    bool lose,army_paladinShied,army_guinevererHair,army_excalibur,army_lancelotSpear,meetHades,meetOmegaWeapon;
     int army_loseUltimecia;
-    bool meetHades,meetOmegaWeapon;
     BaseKnight()
     {
     }
@@ -406,7 +396,7 @@ class BaseKnight {
         this->lose=false;
         this->gil=gil;
         this->antidote=antidote;
-        this->knightType=type;
+        this->knightType=type;  
         switch (type)
         {
             case 0:
@@ -435,6 +425,10 @@ class BaseKnight {
     }
     static BaseKnight * create(int id, int maxhp, int level, int gil, int antidote, int phoenixdownI);
     string toString() const;
+    int getId() const
+    {
+        return id;
+    }
     int getGil() const
     {
         return gil;
@@ -480,6 +474,7 @@ BaseKnight ** armyKnight;
 int N;
 bool PaladinShied,Excalibur,LancelotSpear,GuinevereHair;
 bool meetHades,meetOmegaWeapon;
+bool sortArmy;
 public:
     ArmyKnights (const string & file_armyknights);
     ~ArmyKnights()
@@ -500,6 +495,7 @@ public:
     void printInfo() const;
     void printResult(bool win) const;
     void recoveryLastKnight(BaseKnight *);
+    void sortArmyKnight();
     BaseKnight** getarmyKnight()
     {
         return armyKnight;
