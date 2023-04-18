@@ -2,429 +2,66 @@
 
 /* * * BEGIN implementation of class BaseBag * * */
 // Class PaladinBag
-bool PaladinBag::insertFirst(BaseItem * item)
-{
-    ListNode* newNode = new ListNode();
-    newNode->nextNode = firstNode;
-    newNode->item=item;
-    firstNode = newNode;
-    this->CountItems++;
-    return true;
-}
-BaseItem * PaladinBag::get(ItemType type)
-{
-    ListNode* curNode = firstNode;
-    while (curNode != NULL) 
-    {
-        if (curNode->item->getItem()==type)
-        {
-            BaseItem *item= curNode->item; 
-            curNode->item=firstNode->item;
-            firstNode=firstNode->nextNode;
-            CountItems--;
-            return item;
-        }
-        curNode = curNode->nextNode;
-    }
-    return NULL;
-}
-string PaladinBag::toString() const
-{
-    string s="Bag[count="+to_string(CountItems)+";";
-    ListNode* curNode = firstNode;
-    while (curNode != NULL) 
-    {
-    s=s+ curNode->item->getName();
-    curNode = curNode->nextNode;
-    if (curNode!=NULL) s+=",";
-    }
-    s+="]";
-    return s;
-}
-BaseItem * PaladinBag::getItem(BaseKnight*knight)
-{
-    ListNode* curNode = firstNode;
-    while (curNode != NULL) 
-    {
-        if ((curNode->item->getItem()==PHOENIXDOWN)&&(curNode->item->canUse(knight)))
-        {
-            BaseItem *item= curNode->item; 
-            curNode->item=firstNode->item;
-            firstNode=firstNode->nextNode;
-            CountItems--;
-            return item;
-        }
-        curNode = curNode->nextNode;
-    }
-    return NULL;
-}
 
+PaladinBag::PaladinBag(int phoenixdownI,int antidote)
+{
+        this->Limit=999999;
+        InitialBaseBag(phoenixdownI,antidote);
+}
 // End of class PaladinBag
 
 // Class LancelotBag
-bool LancelotBag::insertFirst(BaseItem * item)
+LancelotBag::LancelotBag(int phoenixdownI,int antidote)
 {
-    ListNode* newNode = new ListNode();
-    newNode->nextNode = firstNode;
-    newNode->item=item;
-    firstNode = newNode;
-    this->CountItems++;
-    return true;
-}
-BaseItem * LancelotBag::get(ItemType type)
-{
-    ListNode* curNode = firstNode;
-    while (curNode != NULL) 
-    {
-        if (curNode->item->getItem()==type)
-        {
-            BaseItem *item= curNode->item; 
-            curNode->item=firstNode->item;
-            firstNode=firstNode->nextNode;
-            CountItems--;
-            return item;
-        }
-        curNode = curNode->nextNode;
-    }
-    return NULL;   
-}
-string LancelotBag::toString() const
-{
-    string s="Bag[count="+to_string(CountItems)+";";
-    ListNode* curNode = firstNode;
-    while (curNode != NULL) 
-    {
-    s=s+ curNode->item->getName();
-    curNode = curNode->nextNode;
-    if (curNode!=NULL) s+=",";
-    }
-    s+="]";
-    return s;
-}
-BaseItem * LancelotBag::getItem(BaseKnight*knight)
-{
-    ListNode* curNode = firstNode;
-    while (curNode != NULL) 
-    {
-        if ((curNode->item->getItem()==PHOENIXDOWN)&&(curNode->item->canUse(knight)))
-        {
-            BaseItem *item= curNode->item; 
-            curNode->item=firstNode->item;
-            firstNode=firstNode->nextNode;
-            CountItems--;
-            return item;
-        }
-        curNode = curNode->nextNode;
-    }
-    return NULL;
+        this->Limit=16;
+        InitialBaseBag(phoenixdownI,antidote);
 }
 // End of class LancelotBag
 
 // Class DragonBag
-bool DragonBag::insertFirst(BaseItem * item)
+DragonBag::DragonBag(int phoenixdownI,int antidote)
 {
-    ListNode* newNode = new ListNode();
-    newNode->nextNode = firstNode;
-    newNode->item=item;
-    firstNode = newNode;
-    this->CountItems++;
-    return true;
-}
-BaseItem * DragonBag::get(ItemType type)
-{
-    ListNode* curNode = firstNode;
-    while (curNode != NULL) 
-    {
-        if (curNode->item->getItem()==type)
-        {
-            BaseItem *item= curNode->item; 
-            curNode->item=firstNode->item;
-            firstNode=firstNode->nextNode;
-            CountItems--;
-            return item;
-        }
-        curNode = curNode->nextNode;
-    }
-    return NULL;
-}
-string DragonBag::toString() const
-{
-    string s="Bag[count="+to_string(CountItems)+";";
-    ListNode* curNode = firstNode;
-    while (curNode != NULL) 
-    {
-    s=s+ curNode->item->getName();
-    curNode = curNode->nextNode;
-    if (curNode!=NULL) s+=",";
-    }
-    s+="]";
-    return s;
-}
-BaseItem * DragonBag::getItem(BaseKnight*knight)
-{
-    ListNode* curNode = firstNode;
-    while (curNode != NULL) 
-    {
-        if ((curNode->item->getItem()==PHOENIXDOWN)&&(curNode->item->canUse(knight)))
-        {
-            BaseItem *item= curNode->item; 
-            curNode->item=firstNode->item;
-            firstNode=firstNode->nextNode;
-            CountItems--;
-            return item;
-        }
-        curNode = curNode->nextNode;
-    }
-    return NULL;
+        this->Limit=14;
+        InitialBaseBag(phoenixdownI,antidote);
 }
 // End of class DragonBag
 
 // Class NormalBag
-bool NormalBag::insertFirst(BaseItem * item)
+NormalBag::NormalBag(int phoenixdownI,int antidote)
 {
-    ListNode* newNode = new ListNode();
-    newNode->nextNode = firstNode;
-    newNode->item=item;
-    firstNode = newNode;
-    this->CountItems++;
-    return true;
-}
-BaseItem * NormalBag::get(ItemType type)
-{
-    ListNode* curNode = firstNode;
-    while (curNode != NULL) 
-    {
-        if (curNode->item->getItem()==type)
-        {
-            
-            BaseItem *item= curNode->item; 
-            curNode->item=firstNode->item;
-            firstNode=firstNode->nextNode;
-            CountItems--;
-            return item;
-        }
-        curNode = curNode->nextNode;
-    }
-    return NULL;
-}
-string NormalBag::toString() const
-{
-    string s="Bag[count="+to_string(CountItems)+";";
-    ListNode* curNode = firstNode;
-    while (curNode != NULL) 
-    {
-    s=s+ curNode->item->getName();
-    curNode = curNode->nextNode;
-    if (curNode!=NULL) s+=",";
-    }
-    s+="]";
-    return s;
-}
-BaseItem * NormalBag::getItem(BaseKnight*knight)
-{
-    ListNode* curNode = firstNode;
-    while (curNode != NULL) 
-    {
-        if ((curNode->item->getItem()==PHOENIXDOWN)&&(curNode->item->canUse(knight)))
-        {
-            BaseItem *item= curNode->item; 
-            curNode->item=firstNode->item;
-            firstNode=firstNode->nextNode;
-            CountItems--;
-            return item;
-        }
-        curNode = curNode->nextNode;
-    }
-    return NULL;
+        this->Limit=19;
+        InitialBaseBag(phoenixdownI,antidote);
 }
 // End of class NormalBag
-
 /* * * END implementation of class BaseBag * * */
 
 /*** Begin implementation of class BaseOpponent ***/
-// Class MadBear;
-void MadBear::fight(BaseKnight * knight)
+// Class BaseOpponent
+void BaseOpponent::fight(BaseKnight *knight)
 {
     if (knight->getKnightType()==0||(knight->getKnightType()==1))
     {
         this->lose(knight); 
         return;
-    }
+    } 
     if(knight->getLevel()>=levelO) this->lose(knight); 
     else this->win(knight);
-} 
-void MadBear::lose(BaseKnight *knight)
+}
+void BaseOpponent::lose(BaseKnight *knight)
 {
    knight->setGil(knight->getGil()+gil);
 }
-void MadBear::win(BaseKnight *knight)
+void BaseOpponent::win(BaseKnight *knight)
 {
     knight->setHP(knight->getHP()-baseDamage*(levelO-knight->getLevel()));
 }
+
+// Class MadBear;
 // End of class MadBear
-void Bandit::fight(BaseKnight * knight)
-{
-    if (knight->getKnightType()==0||(knight->getKnightType()==1))
-    {
-        this->lose(knight); 
-        return;
-    }
-    if(knight->getLevel()>=levelO) this->lose(knight); 
-    else this->win(knight);
-} 
-void Bandit::lose(BaseKnight *knight)
-{
-   knight->setGil(knight->getGil()+gil);
-}
-void Bandit::win(BaseKnight *knight)
-{
-    int HP=knight->getHP()-baseDamage*(levelO-knight->getLevel());
-    if (HP<=0)
-    {
-        BaseItem *item=knight->getBag()->get(PHOENIXDOWN);
-        if (item!=NULL)
-        {
-            item->use(knight);
-            knight->setGil(knight->getGil()+gil);
-        }
-        else
-        {
-            if(knight->getGil()>=100)
-            {
-                knight->setGil(knight->getGil()-100);
-                knight->setHP(knight->getmaxHP()/2);
-            }
-            else 
-            {
-                knight->setHP(HP);
-            }
-        }
-    }
-    else knight->setHP(HP);
-}
+// Class Bandit
 // End of class Bandit
-void LordLupin::fight(BaseKnight * knight)
-{
-    if (knight->getKnightType()==0||(knight->getKnightType()==1))
-    {
-        this->lose(knight); 
-        return;
-    }
-    if(knight->getLevel()>=levelO) this->lose(knight); 
-    else this->win(knight);
-} 
-void LordLupin::lose(BaseKnight *knight)
-{
-   knight->setGil(knight->getGil()+gil);
-}
-void LordLupin::win(BaseKnight *knight)
-{
-    int HP=knight->getHP()-baseDamage*(levelO-knight->getLevel());
-    if (HP<=0)
-    {
-        BaseItem *item=knight->getBag()->get(PHOENIXDOWN);
-        if (item!=NULL)
-        {
-            item->use(knight);
-            knight->setGil(knight->getGil()+gil);
-        }
-        else
-        {
-            if(knight->getGil()>=100)
-            {
-                knight->setGil(knight->getGil()-100);
-                knight->setHP(knight->getmaxHP()/2);
-            }
-            else 
-            {
-                knight->setHP(HP);
-            }
-        }
-    }
-    else knight->setHP(HP);
-}
 // End of class LordLupin
-void Elf::fight(BaseKnight * knight)
-{
-    if (knight->getKnightType()==0||(knight->getKnightType()==1))
-    {
-        this->lose(knight); 
-        return;
-    }
-    if(knight->getLevel()>=levelO) this->lose(knight); 
-    else this->win(knight);
-} 
-void Elf::lose(BaseKnight *knight)
-{
-   knight->setGil(knight->getGil()+gil);
-}
-void Elf::win(BaseKnight *knight)
-{
-    int HP=knight->getHP()-baseDamage*(levelO-knight->getLevel());
-    if (HP<=0)
-    {
-        BaseItem *item=knight->getBag()->get(PHOENIXDOWN);
-        if (item!=NULL)
-        {
-            item->use(knight);
-            knight->setGil(knight->getGil()+gil);
-        }
-        else
-        {
-            if(knight->getGil()>=100)
-            {
-                knight->setGil(knight->getGil()-100);
-                knight->setHP(knight->getmaxHP()/2);
-            }
-            else 
-            {
-                knight->setHP(HP);
-            }
-        }
-    }
-    else knight->setHP(HP);
-}
 // End of class Elf
-void Troll::fight(BaseKnight * knight)
-{
-    if (knight->getKnightType()==0||(knight->getKnightType()==1))
-    {
-        this->lose(knight); 
-        return;
-    }
-    if(knight->getLevel()>=levelO) this->lose(knight); 
-    else this->win(knight);
-} 
-void Troll::lose(BaseKnight *knight)
-{
-   knight->setGil(knight->getGil()+gil);
-}
-void Troll::win(BaseKnight *knight)
-{
-    int HP=knight->getHP()-baseDamage*(levelO-knight->getLevel());
-    if (HP<=0)
-    {
-        BaseItem *item=knight->getBag()->get(PHOENIXDOWN);
-        if (item!=NULL)
-        {
-            item->use(knight);
-            knight->setGil(knight->getGil()+gil);
-        }
-        else
-        {
-            if(knight->getGil()>=100)
-            {
-                knight->setGil(knight->getGil()-100);
-                knight->setHP(knight->getmaxHP()/2);
-            }
-            else 
-            {
-                knight->setHP(HP);
-            }
-        }
-    }
-    else knight->setHP(HP);
-}
 // End of class Troll
 void Tornbery::fight(BaseKnight * knight)
 {
@@ -437,6 +74,7 @@ void Tornbery::lose(BaseKnight *knight)
 }
 void Tornbery::win(BaseKnight *knight)
 {
+    if (knight->getKnightType()==2) return;
     BaseItem*item=knight->getBag()->get(ANTIDOTE);
     if (item==NULL)
     {
@@ -456,12 +94,13 @@ void QueenOfCards::lose(BaseKnight *knight)
 }
 void QueenOfCards::win(BaseKnight *knight)
 {
+    if (knight->getKnightType()==0) return;
     knight->setGil(knight->getGil()/2);
 }
 // End of class QueenOfCards
 void NinadeRings::fight(BaseKnight * knight)
 {
-    if(knight->getGil()>=50) this->lose(knight); 
+    if(knight->getGil()>=50||(knight->getKnightType()==0)) this->lose(knight); 
 } 
 void NinadeRings::lose(BaseKnight *knight)
 {
@@ -599,6 +238,18 @@ BaseKnight* ArmyKnights::lastKnight() const
 {
     return armyKnight[N];
 }
+void CheckingBag(BaseKnight **arr,int N,BaseItem *items)
+{
+    while(N>=1)
+    {
+        if (arr[N]->getBag()->getNumberofItems()<arr[N]->getBag()->getLimit()) 
+        {
+            arr[N]->getBag()->insertFirst(items);
+            return;
+        }
+        else N--;
+    }
+}
 bool ArmyKnights::adventure (Events * events)
 {
     int i=0;
@@ -680,7 +331,7 @@ bool ArmyKnights::adventure (Events * events)
         }
         case 98:
         {
-            this->Excalibur=true;
+            if (this->PaladinShied&&this->LancelotSpear&&this->GuinevereHair) this->Excalibur=true;
             break;
         }
         case 99:
@@ -691,19 +342,20 @@ bool ArmyKnights::adventure (Events * events)
         case 112:
         {
             BaseItem *item=new PhoenixdownII(PHOENIXDOWN);
-            this->lastKnight()->getBag()->insertFirst(item);
+            CheckingBag(armyKnight,N,item);
             break;
         }
         case 113:
         {
             BaseItem *item=new PhoenixdownIII(PHOENIXDOWN);
-            this->lastKnight()->getBag()->insertFirst(item);
+            CheckingBag(armyKnight,N,item);
             break;
         }
         case 114:
         {
             BaseItem *item=new PhoenixdownIV(PHOENIXDOWN);
             this->lastKnight()->getBag()->insertFirst(item);
+            CheckingBag(armyKnight,N,item);
             break;
         }
         default:
@@ -711,6 +363,8 @@ bool ArmyKnights::adventure (Events * events)
         }
         if (N==0)
         {
+            //   cout<<endl<<"ok"<<endl;
+            printInfo();
             printResult(false);
             return false;
         }
@@ -722,16 +376,16 @@ bool ArmyKnights::adventure (Events * events)
                 if(this->lastKnight()->army_loseUltimecia==1) 
                 {
                     N=0;
-                    printResult(false);
                 }
                 if (IdEnemy==99)
                 {
-                    while(this->lastKnight()->getKnightType()==3)
+                    while(this->lastKnight()->getKnightType()==3&&N!=0)
                     {
                         N--;
                         if (N==0) break;
                     }
-                } else N--;
+                } 
+                else N--;
             }  
             else 
             {
@@ -744,12 +398,25 @@ bool ArmyKnights::adventure (Events * events)
             }
         }
         else 
-        {
+        {  
             printInfo();
             i++;
         }
     }
     return false;
+}
+void passing(BaseKnight **arr,int N)
+{
+    int remainGil=arr[N]->getGil()-999;
+    arr[N]->setGil(999);
+    int k=N;
+    while(remainGil>0&&k>1)
+    {
+        k--;
+        arr[k]->setGil(arr[k]->getGil()+remainGil);
+        remainGil=arr[k]->getGil()-999;
+        if(k==1&&arr[1]->getGil()>999) arr[1]->setGil(999);
+    }
 }
 bool ArmyKnights::fight(BaseOpponent* opponent)
 {
@@ -762,6 +429,7 @@ bool ArmyKnights::fight(BaseOpponent* opponent)
     this->recoveryLastKnight(this->lastKnight());
     if (this->lastKnight()->getHP()<=0||this->lastKnight()->lose==true) return true; else
     {
+        if(this->lastKnight()->getGil()>999) passing(armyKnight,N);
         this->Excalibur=this->lastKnight()->army_excalibur;
         this->GuinevereHair=this->lastKnight()->army_guinevererHair;
         this->LancelotSpear=this->lastKnight()->army_lancelotSpear;
@@ -873,7 +541,6 @@ string PhoenixdownI::getName()
 {
     return "PhoenixI";
 }
-
 bool PhoenixdownII::canUse(BaseKnight *knight)
 {
     int HP=knight->getHP();
@@ -902,7 +569,6 @@ string PhoenixdownIII::getName()
 {
     return "PhoenixIII";
 }
-
 
 bool PhoenixdownIV::canUse(BaseKnight *knight)
 {

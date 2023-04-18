@@ -4,13 +4,13 @@
 #include "main.h"
 
 // #define DEBUG
-enum ItemType {PHOENIXDOWN=0,ANTIDOTE};
+enum ItemType {PHOENIXDOWN=0,ANTIDOTE=1};
 enum KnightType { PALADIN = 0, LANCELOT, DRAGON, NORMAL };
 class BaseKnight;
 // Begin implement of class BaseItem
 class BaseItem {
 protected:
-    ItemType item;
+ItemType item;
 public:
     virtual bool canUse ( BaseKnight * knight ) = 0;
     virtual void use ( BaseKnight * knight ) = 0;
@@ -22,7 +22,6 @@ public:
 };
 class PhoenixdownI:public BaseItem
 {
-    
     public:
     PhoenixdownI(ItemType item)
     {
@@ -34,36 +33,33 @@ class PhoenixdownI:public BaseItem
 };
 class PhoenixdownII:public BaseItem
 {
-
     public:
     PhoenixdownII(ItemType item)
     {
         this->item=item;
-    };
+    }
     bool canUse(BaseKnight *knight);
     void use ( BaseKnight * knight );
     string getName();
 };
 class PhoenixdownIII:public BaseItem
 {
-
     public:
     PhoenixdownIII(ItemType item)
     {
         this->item=item;
-    };
+    }
     bool canUse(BaseKnight *knight);
     void use ( BaseKnight * knight );
     string getName();
 };
 class PhoenixdownIV:public BaseItem
 {
-
     public:
     PhoenixdownIV(ItemType item)
     {
         this->item=item;
-    };
+    }
     bool canUse(BaseKnight *knight);
     void use ( BaseKnight * knight );
     string getName();
@@ -74,7 +70,7 @@ class Antidote:public BaseItem
     Antidote(ItemType item)
     {
         this->item=item;
-    };
+    }
     bool canUse(BaseKnight *knight)
     {
         return true;
@@ -98,214 +94,158 @@ struct ListNode {
 class Events;
 // Begin Define BaseBag;
 class BaseBag {
+protected:
+    ListNode* firstNode;
+    int Limit,CountItems;
 public:
-    virtual bool insertFirst(BaseItem * item)=0;
-    virtual BaseItem * get(ItemType itemType)=0;
-    virtual string toString() const=0;
-    virtual ListNode * iterator()=0;
-    virtual void Drop3items()=0;
-    virtual BaseItem * getItem(BaseKnight* knight)=0;
+    void InitialBaseBag(int phoenixdownI,int antidote)
+    {
+        firstNode=NULL;
+        CountItems=0;
+        for(int i=1;i<=phoenixdownI;i++)
+        {            
+            ListNode* newNode = new ListNode();
+            newNode->nextNode = firstNode;
+            newNode->item=new PhoenixdownI(PHOENIXDOWN);
+            firstNode = newNode;
+            this->CountItems++;
+        }
+        for(int i=1;i<=antidote;i++)
+        {
+            ListNode* newNode = new ListNode();
+            newNode->nextNode = firstNode;
+            newNode->item=new Antidote(ANTIDOTE);
+            firstNode = newNode;
+            this->CountItems++;
+        }
+    };
+    virtual bool insertFirst(BaseItem * item)
+    {
+        ListNode* newNode = new ListNode();
+        newNode->nextNode = firstNode;
+        newNode->item=item;
+        firstNode = newNode;
+        this->CountItems++;
+        return true;
+    };
+    virtual string toString() const
+    {
+        string s="Bag[count="+to_string(CountItems)+";";
+        ListNode* curNode = firstNode;
+        while (curNode != NULL) 
+        {
+        s=s+ curNode->item->getName();
+        curNode = curNode->nextNode;
+        if (curNode!=NULL) s+=",";
+        }
+        s+="]";
+        return s;
+    };
+    virtual ListNode * iterator()
+    {
+        return firstNode;
+    }
+    virtual void Drop3items()
+    {
+        int i=1;
+        while(i<=3)
+        {
+            if (firstNode==NULL) break;
+            firstNode=firstNode->nextNode;
+            i++;
+        }
+    };
+    virtual BaseItem * getItem(BaseKnight* knight)
+    { 
+        ListNode* curNode = firstNode;
+        while (curNode != NULL) 
+        {
+            if ((curNode->item->getItem()==PHOENIXDOWN)&&(curNode->item->canUse(knight)))
+            {
+                BaseItem *item= curNode->item; 
+                curNode->item=firstNode->item;
+                firstNode=firstNode->nextNode;
+                CountItems--;
+                return item;
+            }
+            curNode = curNode->nextNode;
+        }
+        return NULL;
+    };
+    virtual int getNumberofItems()
+    {
+        return CountItems;
+    };
+    virtual int getLimit()
+    {
+        return Limit;
+    };
+    BaseItem * get(ItemType type)
+    {
+        ListNode* curNode = firstNode;
+        while (curNode != NULL) 
+        {
+            if (curNode->item->getItem()==type)
+            {
+                
+                BaseItem *item= curNode->item; 
+                curNode->item=firstNode->item;
+                firstNode=firstNode->nextNode;
+                CountItems--;
+                return item;
+            }
+            curNode = curNode->nextNode;
+        }
+        return NULL;
+    }
 };
 class PaladinBag:public BaseBag
 {
-    private:
-    ListNode* firstNode;
-    int CountItems;
     public:
-    PaladinBag(int phoenixdownI,int antidote)
-    {
-        firstNode=NULL;
-        CountItems=0;
-        for(int i=1;i<=phoenixdownI;i++)
-        {            
-            ListNode* newNode = new ListNode();
-            newNode->nextNode = firstNode;
-            newNode->item=new PhoenixdownI(PHOENIXDOWN);
-            firstNode = newNode;
-            this->CountItems++;
-        }
-        for(int i=1;i<=antidote;i++)
-        {
-            ListNode* newNode = new ListNode();
-            newNode->nextNode = firstNode;
-            newNode->item=new Antidote(ANTIDOTE);
-            firstNode = newNode;
-            this->CountItems++;
-        }
-        cout<<firstNode;
-    }
-    bool insertFirst(BaseItem*);
-    BaseItem * get(ItemType );
-    string toString() const;
-    ListNode * iterator()
-    {
-        return firstNode;
-    }
-    BaseItem * getItem(BaseKnight* knight);
-    void Drop3items()
-    {
-        int i=1;
-        while(i<=3)
-        {
-            firstNode=firstNode->nextNode;
-            if (firstNode==NULL) break;
-            i++;
-        }
-    }
+    PaladinBag(int phoenixdownI,int antidote);
 };
 class LancelotBag:public BaseBag
 {
-    private:
-    ListNode* firstNode;
-    int CountItems;
     public:
-    LancelotBag(int phoenixdownI,int antidote)
-    {
-        firstNode=NULL;
-        CountItems=0;
-        for(int i=1;i<=phoenixdownI;i++)
-        {            
-            ListNode* newNode = new ListNode();
-            newNode->nextNode = firstNode;
-            newNode->item=new PhoenixdownI(PHOENIXDOWN);
-            firstNode = newNode;
-            this->CountItems++;
-        }
-        for(int i=1;i<=antidote;i++)
-        {
-            ListNode* newNode = new ListNode();
-            newNode->nextNode = firstNode;
-            newNode->item=new Antidote(ANTIDOTE);
-            firstNode = newNode;
-            this->CountItems++;
-        }
-    }
-    bool insertFirst(BaseItem *);
-    BaseItem * get(ItemType);
-    string toString() const;
-    BaseItem * getItem(BaseKnight* knight);
-    ListNode * iterator()
-    {
-        return firstNode;
-    }
-    void Drop3items()
-    {
-        int i=1;
-        while(i<=3)
-        {
-            firstNode=firstNode->nextNode;
-            if (firstNode==NULL) break;
-            i++;
-        }
-    }
+    LancelotBag(int phoenixdownI,int antidote);
 };
 class DragonBag:public BaseBag
 {
-    private:
-    ListNode* firstNode;
-    int CountItems;
     public:
-    DragonBag(int phoenixdownI,int antidote)
-    {
-        CountItems=0;
-        firstNode=NULL;
-        for(int i=1;i<=phoenixdownI;i++)
-        {            
-            ListNode* newNode = new ListNode();
-            newNode->nextNode = firstNode;
-            newNode->item=new PhoenixdownI(PHOENIXDOWN);
-            firstNode = newNode;
-            this->CountItems++;
-        }
-        for(int i=1;i<=antidote;i++)
-        {
-            ListNode* newNode = new ListNode();
-            newNode->nextNode = firstNode;
-            newNode->item=new Antidote(ANTIDOTE);
-            firstNode = newNode;
-            this->CountItems++;
-        }
-    }
-    bool insertFirst(BaseItem * );
-    BaseItem * get(ItemType );
-    string toString() const;
-    BaseItem * getItem(BaseKnight* knight);
-    ListNode * iterator()
-    {
-        return firstNode;
-    }
-    void Drop3items()
-    {
-        int i=1;
-        while(i<=3)
-        {
-            firstNode=firstNode->nextNode;
-            if (firstNode==NULL) break;
-            i++;
-        }
-    }
+    DragonBag(int phoenixdownI,int antidote);
 };
 class NormalBag:public BaseBag
 {
-    private:
-    ListNode* firstNode;
-    int CountItems;
     public:
-    NormalBag(int phoenixdownI,int antidote)
-    {
-        CountItems=0;
-        firstNode=NULL;
-        for(int i=1;i<=phoenixdownI;i++)
-        {            
-            ListNode* newNode = new ListNode();
-            newNode->nextNode = firstNode;
-            newNode->item=new PhoenixdownI(PHOENIXDOWN);
-            firstNode = newNode;
-            this->CountItems++;
-        }
-        for(int i=1;i<=antidote;i++)
-        {
-            ListNode* newNode = new ListNode();
-            newNode->nextNode = firstNode;
-            newNode->item=new Antidote(ANTIDOTE);
-            firstNode = newNode;
-            this->CountItems++;
-        }
-    }
-    bool insertFirst(BaseItem * );
-    BaseItem * get(ItemType );
-    string toString() const;
-    BaseItem * getItem(BaseKnight* knight);
-    ListNode * iterator()
-    {
-        return firstNode;
-    }
-    void Drop3items()
-    {
-        int i=1;
-        while(i<=3)
-        {
-            if (firstNode==NULL) break;
-            firstNode=firstNode->nextNode;
-            i++;
-        }
-    }
+    NormalBag(int phoenixdownI,int antidote);
 };
 // End Define Base Bag
 
 // Begin implementation of class BaseOpponent
 class BaseOpponent
 {
+    protected:
+    int levelO,baseDamage,gil;
     public:
-    virtual int getLevel()=0;
-    virtual int getGil()=0;
-    virtual int getBaseDamage()=0;
-    virtual void fight(BaseKnight * knight)=0;
+    virtual int getLevel()
+    {
+        return levelO;
+    }
+    virtual int getGil()
+    {
+        return gil;
+    }
+    virtual int getBaseDamage()
+    {
+        return baseDamage;
+    }
+    virtual void lose(BaseKnight *);
+    virtual void win(BaseKnight *);
+    virtual void fight(BaseKnight * knight);
 };
 class MadBear:public BaseOpponent
 {
-    private:
-    int levelO,baseDamage,gil;
+    
     public:
     MadBear(int i,int IdEnemy)
     {
@@ -313,26 +253,9 @@ class MadBear:public BaseOpponent
         gil=100;
         levelO=(i+IdEnemy)%10+1;
     }
-    int getLevel()
-    {
-        return levelO;
-    }
-    int getGil()
-    {
-        return gil;
-    }
-    int getBaseDamage()
-    {
-        return baseDamage;
-    } 
-    void fight(BaseKnight *);
-    void lose(BaseKnight *);
-    void win(BaseKnight *);
 };
 class Bandit:public BaseOpponent
 {
-    private:
-    int levelO,baseDamage,gil;
     public:
     Bandit(int i,int IdEnemy)
     {
@@ -340,26 +263,9 @@ class Bandit:public BaseOpponent
         gil=150;
         levelO=(i+IdEnemy)%10+1;
     }
-    int getLevel()
-    {
-        return levelO;
-    }
-    int getGil()
-    {
-        return gil;
-    }
-    int getBaseDamage()
-    {
-        return baseDamage;
-    } 
-    void fight(BaseKnight *);
-    void lose(BaseKnight *);
-    void win(BaseKnight *);
 };
 class LordLupin:public BaseOpponent
 {
-    private:
-    int levelO,baseDamage,gil;
     public:
     LordLupin(int i,int IdEnemy)
     {
@@ -367,26 +273,9 @@ class LordLupin:public BaseOpponent
         gil=450;
         levelO=(i+IdEnemy)%10+1;
     }
-    int getLevel()
-    {
-        return levelO;
-    }
-    int getGil()
-    {
-        return gil;
-    }
-    int getBaseDamage()
-    {
-        return baseDamage;
-    } 
-    void fight(BaseKnight *);
-    void lose(BaseKnight *);
-    void win(BaseKnight *);
 };
 class Elf:public BaseOpponent
 {
-    private:
-    int levelO,baseDamage,gil;
     public:
     Elf(int i,int IdEnemy)
     {
@@ -394,26 +283,9 @@ class Elf:public BaseOpponent
         gil=750;
         levelO=(i+IdEnemy)%10+1;
     }
-    int getLevel()
-    {
-        return levelO;
-    }
-    int getGil()
-    {
-        return gil;
-    }
-    int getBaseDamage()
-    {
-        return baseDamage;
-    } 
-    void fight(BaseKnight *);
-    void lose(BaseKnight *);
-    void win(BaseKnight *);
 };
 class Troll:public BaseOpponent
 {
-    private:
-    int levelO,baseDamage,gil;
     public:
     Troll(int i,int IdEnemy)
     {
@@ -421,143 +293,58 @@ class Troll:public BaseOpponent
         gil=800;
         levelO=(i+IdEnemy)%10+1;
     }
-    int getLevel()
-    {
-        return levelO;
-    }
-    int getGil()
-    {
-        return gil;
-    }
-    int getBaseDamage()
-    {
-        return baseDamage;
-    } 
-    void fight(BaseKnight *);
-    void lose(BaseKnight *);
-    void win(BaseKnight *);
 };
 class Tornbery:public BaseOpponent
 {
-    private:
-    int levelO;
     public:
     Tornbery(int i,int IdEnemy)
     {
+        baseDamage=0;
+        gil=0;
         levelO=(i+IdEnemy)%10+1;
     }
-    int getLevel()
-    {
-        return levelO;
-    }
-    int getGil()
-    {
-        return 0;
-    }
-    int getBaseDamage()
-    {
-        return 0;
-    } 
     void fight(BaseKnight *);
     void lose(BaseKnight *);
     void win(BaseKnight *);
 };
 class QueenOfCards:public BaseOpponent
 {
-    private:
-    int levelO;
     public:
     QueenOfCards(int i,int IdEnemy)
     {
         levelO=(i+IdEnemy)%10+1;
     }
-    int getLevel()
-    {
-        return levelO;
-    }
-    int getGil()
-    {
-        return 0;
-    }
-    int getBaseDamage()
-    {
-        return 0;
-    } 
     void fight(BaseKnight *);
     void lose(BaseKnight *);
     void win(BaseKnight *);
 };
 class NinadeRings:public BaseOpponent
 {
-    private:
-    int levelO;
+
     public:
     NinadeRings(int i,int IdEnemy)
     {
         levelO=0;
     }
-    int getLevel()
-    {
-        return levelO;
-    }
-    int getGil()
-    {
-        return 0;
-    }
-    int getBaseDamage()
-    {
-        return 0;
-    } 
     void fight(BaseKnight *);
     void lose(BaseKnight *);
-    void win(BaseKnight *);
 };
 class DurianGarden:public BaseOpponent
 {
-    private:
-    int levelO;
     public:
     DurianGarden(int i,int IdEnemy)
     {
         levelO=0;
     }
-    int getLevel()
-    {
-        return 0;
-    }
-    int getGil()
-    {
-        return 0;
-    }
-    int getBaseDamage()
-    {
-        return 0;
-    } 
     void fight(BaseKnight *);
-    void lose(BaseKnight *);
-    void win(BaseKnight *);
 };
 class OmegaWeapon:public BaseOpponent
 {
-    private:
-    int levelO;
     public:
     OmegaWeapon(int i,int IdEnemy)
     {
         levelO=(i+IdEnemy)%10+1;
     }
-    int getLevel()
-    {
-        return levelO;
-    }
-    int getGil()
-    {
-        return 0;
-    }
-    int getBaseDamage()
-    {
-        return 0;
-    } 
     void fight(BaseKnight *);
     void lose(BaseKnight *);
     void win(BaseKnight *);
@@ -568,18 +355,6 @@ class Hades:public BaseOpponent
     public:
     Hades()
     {}
-    int getGil()
-    {
-        return 0;
-    }
-    int getBaseDamage()
-    {
-        return 0;
-    }
-    int getLevel()
-    {
-        return 0;
-    }
     void fight(BaseKnight *);
     void lose(BaseKnight *);
     void win(BaseKnight *);
@@ -594,18 +369,6 @@ class Ultimecia:public BaseOpponent
     {
         HP=5000;
     };
-    int getGil()
-    {
-        return 0;
-    }
-    int getBaseDamage()
-    {
-        return 0;
-    }
-    int getLevel()
-    {
-        return 0;
-    }
     void fight(BaseKnight *);
     void lose(BaseKnight *);
     void win(BaseKnight *);
@@ -629,7 +392,7 @@ class BaseKnight {
     bool army_excalibur;
     bool army_lancelotSpear;
     int army_loseUltimecia;
-    bool meetHades;
+    bool meetHades,meetOmegaWeapon;
     BaseKnight()
     {
     }
@@ -691,7 +454,6 @@ class BaseKnight {
     void setGil(int Gil)
     {
         gil=Gil;
-        if (Gil>999) gil=999;
     }
     void setHP(int HP)
     {
@@ -717,7 +479,7 @@ private:
 BaseKnight ** armyKnight;
 int N;
 bool PaladinShied,Excalibur,LancelotSpear,GuinevereHair;
-bool meetHades;
+bool meetHades,meetOmegaWeapon;
 public:
     ArmyKnights (const string & file_armyknights);
     ~ArmyKnights()
