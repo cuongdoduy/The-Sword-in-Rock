@@ -403,7 +403,7 @@ bool ArmyKnights::adventure (Events * events)
         }
         if (opponent!=NULL)
         {
-            if (IdEnemy==99&&sortArmy==false)
+            if (IdEnemy==99&&sortArmy==false&&this->Excalibur==false)
             {
                 sortArmyKnight();
                 sortArmy=true;
@@ -420,20 +420,23 @@ bool ArmyKnights::adventure (Events * events)
             else 
             {
                 if (this->lastKnight()->army_loseUltimecia==0)
-                {
-                    BaseKnight *knight;
-                    for (int i = N; i >= 2; i--){
-                        for (int j = 1; j < i; j++)
-                        {
-                            if(armyKnight[j]->getId()>armyKnight[j+1]->getId())
+                {        
+                    if(this->Excalibur==false)
+                    {
+                        BaseKnight *knight=NULL;
+                        for (int i = N; i >= 2; i--){
+                            for (int j = 1; j < i; j++)
                             {
-                                knight=armyKnight[i];
-                                armyKnight[i]=armyKnight[j];
-                                armyKnight[j]=knight;
+                                if(armyKnight[j]->getId()>armyKnight[j+1]->getId())
+                                {
+                                    knight=armyKnight[i];
+                                    armyKnight[i]=armyKnight[j];
+                                    armyKnight[j]=knight;
+                                }
                             }
-                        }
-                    }                      
-                    delete knight;      
+                        }                      
+                        delete knight;      
+                    }            
                     printInfo();
                     printResult(true);
                     return true;
@@ -646,8 +649,16 @@ void passing(BaseKnight **arr,int N)
     while(remainGil>0&&k>1)
     {
         k--;
-        arr[k]->setGil(arr[k]->getGil()+remainGil);
-        remainGil=arr[k]->getGil()-999;
+        if ( arr[k]->getGil()+remainGil>999)
+        {
+            remainGil=arr[k]->getGil()+remainGil-999;
+            arr[k]->setGil(999);
+        }
+        else
+        {
+            arr[k]->setGil(arr[k]->getGil()+remainGil);
+            remainGil=0;
+        }
         if(k==1&&arr[1]->getGil()>999) arr[1]->setGil(999);
     }
 }
