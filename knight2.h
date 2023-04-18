@@ -9,16 +9,20 @@ enum KnightType { PALADIN = 0, LANCELOT, DRAGON, NORMAL };
 class BaseKnight;
 // Begin implement of class BaseItem
 class BaseItem {
+protected:
+    ItemType item;
 public:
     virtual bool canUse ( BaseKnight * knight ) = 0;
     virtual void use ( BaseKnight * knight ) = 0;
     virtual string getName()=0;
-    virtual ItemType getItem()=0;
+    virtual ItemType getItem()
+    {
+        return item;
+    }
 };
 class PhoenixdownI:public BaseItem
 {
-    private:
-    ItemType item;
+    
     public:
     PhoenixdownI(ItemType item)
     {
@@ -27,47 +31,50 @@ class PhoenixdownI:public BaseItem
     bool canUse(BaseKnight *knight);
     void use ( BaseKnight * knight );
     string getName();
-    ItemType getItem();
 };
 class PhoenixdownII:public BaseItem
 {
-    private:
-    ItemType item;
+
     public:
-    PhoenixdownII(ItemType item):item(item){};
+    PhoenixdownII(ItemType item)
+    {
+        this->item=item;
+    };
     bool canUse(BaseKnight *knight);
     void use ( BaseKnight * knight );
     string getName();
-    ItemType getItem();
 };
 class PhoenixdownIII:public BaseItem
 {
-    private:
-    ItemType item;
+
     public:
-    PhoenixdownIII(ItemType item):item(item){};
+    PhoenixdownIII(ItemType item)
+    {
+        this->item=item;
+    };
     bool canUse(BaseKnight *knight);
     void use ( BaseKnight * knight );
     string getName();
-    ItemType getItem();
 };
 class PhoenixdownIV:public BaseItem
 {
-    private:
-    ItemType item;
+
     public:
-    PhoenixdownIV(ItemType item):item(item){};
+    PhoenixdownIV(ItemType item)
+    {
+        this->item=item;
+    };
     bool canUse(BaseKnight *knight);
     void use ( BaseKnight * knight );
     string getName();
-    ItemType getItem();
 };
 class Antidote:public BaseItem
 {
-    private:
-    ItemType item;
     public:
-    Antidote(ItemType item):item(item){};
+    Antidote(ItemType item)
+    {
+        this->item=item;
+    };
     bool canUse(BaseKnight *knight)
     {
         return true;
@@ -79,10 +86,6 @@ class Antidote:public BaseItem
     string getName()
     {
         return "Antidote";
-    }
-    ItemType getItem()
-    {
-        return item;
     }
 };
 // End implement of class BaseItem

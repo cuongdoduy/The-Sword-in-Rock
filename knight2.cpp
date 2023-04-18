@@ -873,10 +873,6 @@ string PhoenixdownI::getName()
 {
     return "PhoenixI";
 }
-ItemType PhoenixdownI::getItem()
-{
-    return item;
-}
 
 bool PhoenixdownII::canUse(BaseKnight *knight)
 {
@@ -890,10 +886,6 @@ void PhoenixdownII::use(BaseKnight *knight)
 string PhoenixdownII::getName()
 {
     return "PhoenixII";
-}
-ItemType PhoenixdownII::getItem()
-{
-    return item;
 }
 
 bool PhoenixdownIII::canUse(BaseKnight *knight)
@@ -910,10 +902,7 @@ string PhoenixdownIII::getName()
 {
     return "PhoenixIII";
 }
-ItemType PhoenixdownIII::getItem()
-{
-    return item;
-}
+
 
 bool PhoenixdownIV::canUse(BaseKnight *knight)
 {
@@ -928,10 +917,6 @@ void PhoenixdownIV::use(BaseKnight *knight)
 string PhoenixdownIV::getName()
 {
     return "PhoenixIV";
-}
-ItemType PhoenixdownIV::getItem()
-{
-    return item;
 }
 
 // More function declare
