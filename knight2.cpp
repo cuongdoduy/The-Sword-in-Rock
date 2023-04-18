@@ -11,28 +11,6 @@ bool PaladinBag::insertFirst(BaseItem * item)
     this->CountItems++;
     return true;
 }
-PaladinBag::PaladinBag(int phoenixdownI,int antidote)
-{
-        this->Limit=99999;
-        firstNode=NULL;
-        CountItems=0;
-        for(int i=1;i<=phoenixdownI;i++)
-        {            
-            ListNode* newNode = new ListNode();
-            newNode->nextNode = firstNode;
-            newNode->item=new PhoenixdownI(PHOENIXDOWN);
-            firstNode = newNode;
-            this->CountItems++;
-        }
-        for(int i=1;i<=antidote;i++)
-        {
-            ListNode* newNode = new ListNode();
-            newNode->nextNode = firstNode;
-            newNode->item=new Antidote(ANTIDOTE);
-            firstNode = newNode;
-            this->CountItems++;
-        }
-}
 BaseItem * PaladinBag::get(ItemType type)
 {
     ListNode* curNode = firstNode;
@@ -65,6 +43,20 @@ string PaladinBag::toString() const
 }
 BaseItem * PaladinBag::getItem(BaseKnight*knight)
 {
+    ListNode* curNode = firstNode;
+    while (curNode != NULL) 
+    {
+        if ((curNode->item->getItem()==PHOENIXDOWN)&&(curNode->item->canUse(knight)))
+        {
+            BaseItem *item= curNode->item; 
+            curNode->item=firstNode->item;
+            firstNode=firstNode->nextNode;
+            CountItems--;
+            return item;
+        }
+        curNode = curNode->nextNode;
+    }
+    return NULL;
 }
 
 // End of class PaladinBag
@@ -445,7 +437,6 @@ void Tornbery::lose(BaseKnight *knight)
 }
 void Tornbery::win(BaseKnight *knight)
 {
-    if (knight->getKnightType()==2) return;
     BaseItem*item=knight->getBag()->get(ANTIDOTE);
     if (item==NULL)
     {
@@ -465,13 +456,12 @@ void QueenOfCards::lose(BaseKnight *knight)
 }
 void QueenOfCards::win(BaseKnight *knight)
 {
-    if (knight->getKnightType()==0) return;
     knight->setGil(knight->getGil()/2);
 }
 // End of class QueenOfCards
 void NinadeRings::fight(BaseKnight * knight)
 {
-    if(knight->getGil()>=50||(knight->getKnightType()==0)) this->lose(knight); 
+    if(knight->getGil()>=50) this->lose(knight); 
 } 
 void NinadeRings::lose(BaseKnight *knight)
 {
@@ -609,18 +599,6 @@ BaseKnight* ArmyKnights::lastKnight() const
 {
     return armyKnight[N];
 }
-void CheckingBag(BaseKnight **arr,int N,BaseItem *items)
-{
-    while(N>=1)
-    {
-        if (arr[N]->getBag()->getNumberofItems()<arr[N]->getBag()->getLimit()) 
-        {
-            arr[N]->getBag()->insertFirst(items);
-            return;
-        }
-        else N--;
-    }
-}
 bool ArmyKnights::adventure (Events * events)
 {
     int i=0;
@@ -713,20 +691,19 @@ bool ArmyKnights::adventure (Events * events)
         case 112:
         {
             BaseItem *item=new PhoenixdownII(PHOENIXDOWN);
-            CheckingBag(armyKnight,N,item);
+            this->lastKnight()->getBag()->insertFirst(item);
             break;
         }
         case 113:
         {
             BaseItem *item=new PhoenixdownIII(PHOENIXDOWN);
-            CheckingBag(armyKnight,N,item);
+            this->lastKnight()->getBag()->insertFirst(item);
             break;
         }
         case 114:
         {
             BaseItem *item=new PhoenixdownIV(PHOENIXDOWN);
             this->lastKnight()->getBag()->insertFirst(item);
-            CheckingBag(armyKnight,N,item);
             break;
         }
         default:
@@ -749,7 +726,6 @@ bool ArmyKnights::adventure (Events * events)
                 }
                 if (IdEnemy==99)
                 {
-                    
                     while(this->lastKnight()->getKnightType()==3)
                     {
                         N--;
@@ -768,25 +744,12 @@ bool ArmyKnights::adventure (Events * events)
             }
         }
         else 
-        {  
+        {
             printInfo();
             i++;
         }
     }
     return false;
-}
-void passing(BaseKnight **arr,int N)
-{
-    int remainGil=arr[N]->getGil()-999;
-    arr[N]->setGil(999);
-    int k=N;
-    while(remainGil>0&&k>=1)
-    {
-        k--;
-        arr[k]->setGil(arr[k]->getGil()+remainGil);
-        remainGil=arr[k]->getGil()-999;
-        if(k==1&&arr[1]->getGil()>999) arr[1]->setGil(999);
-    }
 }
 bool ArmyKnights::fight(BaseOpponent* opponent)
 {
@@ -799,7 +762,6 @@ bool ArmyKnights::fight(BaseOpponent* opponent)
     this->recoveryLastKnight(this->lastKnight());
     if (this->lastKnight()->getHP()<=0||this->lastKnight()->lose==true) return true; else
     {
-        if(this->lastKnight()->getGil()>=999) passing(armyKnight,N);
         this->Excalibur=this->lastKnight()->army_excalibur;
         this->GuinevereHair=this->lastKnight()->army_guinevererHair;
         this->LancelotSpear=this->lastKnight()->army_lancelotSpear;
@@ -911,7 +873,10 @@ string PhoenixdownI::getName()
 {
     return "PhoenixI";
 }
-
+ItemType PhoenixdownI::getItem()
+{
+    return item;
+}
 
 bool PhoenixdownII::canUse(BaseKnight *knight)
 {
@@ -925,6 +890,10 @@ void PhoenixdownII::use(BaseKnight *knight)
 string PhoenixdownII::getName()
 {
     return "PhoenixII";
+}
+ItemType PhoenixdownII::getItem()
+{
+    return item;
 }
 
 bool PhoenixdownIII::canUse(BaseKnight *knight)
@@ -941,6 +910,10 @@ string PhoenixdownIII::getName()
 {
     return "PhoenixIII";
 }
+ItemType PhoenixdownIII::getItem()
+{
+    return item;
+}
 
 bool PhoenixdownIV::canUse(BaseKnight *knight)
 {
@@ -955,6 +928,10 @@ void PhoenixdownIV::use(BaseKnight *knight)
 string PhoenixdownIV::getName()
 {
     return "PhoenixIV";
+}
+ItemType PhoenixdownIV::getItem()
+{
+    return item;
 }
 
 // More function declare

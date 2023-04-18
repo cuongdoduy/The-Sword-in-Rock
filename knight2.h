@@ -9,19 +9,16 @@ enum KnightType { PALADIN = 0, LANCELOT, DRAGON, NORMAL };
 class BaseKnight;
 // Begin implement of class BaseItem
 class BaseItem {
-protected:
-ItemType item;
 public:
     virtual bool canUse ( BaseKnight * knight ) = 0;
     virtual void use ( BaseKnight * knight ) = 0;
     virtual string getName()=0;
-    virtual ItemType getItem()
-    {
-        return item;
-    }
+    virtual ItemType getItem()=0;
 };
 class PhoenixdownI:public BaseItem
 {
+    private:
+    ItemType item;
     public:
     PhoenixdownI(ItemType item)
     {
@@ -30,39 +27,40 @@ class PhoenixdownI:public BaseItem
     bool canUse(BaseKnight *knight);
     void use ( BaseKnight * knight );
     string getName();
+    ItemType getItem();
 };
 class PhoenixdownII:public BaseItem
 {
+    private:
+    ItemType item;
     public:
-    PhoenixdownII(ItemType item)
-    {
-        this->item=item;
-    }
+    PhoenixdownII(ItemType item):item(item){};
     bool canUse(BaseKnight *knight);
     void use ( BaseKnight * knight );
     string getName();
+    ItemType getItem();
 };
 class PhoenixdownIII:public BaseItem
 {
+    private:
+    ItemType item;
     public:
-    PhoenixdownIII(ItemType item)
-    {
-        this->item=item;
-    }
+    PhoenixdownIII(ItemType item):item(item){};
     bool canUse(BaseKnight *knight);
     void use ( BaseKnight * knight );
     string getName();
+    ItemType getItem();
 };
 class PhoenixdownIV:public BaseItem
 {
+    private:
+    ItemType item;
     public:
-    PhoenixdownIV(ItemType item)
-    {
-        this->item=item;
-    }
+    PhoenixdownIV(ItemType item):item(item){};
     bool canUse(BaseKnight *knight);
     void use ( BaseKnight * knight );
     string getName();
+    ItemType getItem();
 };
 class Antidote:public BaseItem
 {
@@ -82,6 +80,10 @@ class Antidote:public BaseItem
     {
         return "Antidote";
     }
+    ItemType getItem()
+    {
+        return item;
+    }
 };
 // End implement of class BaseItem
 
@@ -93,12 +95,21 @@ struct ListNode {
 class Events;
 // Begin Define BaseBag;
 class BaseBag {
-protected:
-    ListNode* firstNode;
-    int Limit,CountItems;
 public:
-    BaseBag(); 
-    BaseBag(int phoenixdownI,int antidote)
+    virtual bool insertFirst(BaseItem * item)=0;
+    virtual BaseItem * get(ItemType itemType)=0;
+    virtual string toString() const=0;
+    virtual ListNode * iterator()=0;
+    virtual void Drop3items()=0;
+    virtual BaseItem * getItem(BaseKnight* knight)=0;
+};
+class PaladinBag:public BaseBag
+{
+    private:
+    ListNode* firstNode;
+    int CountItems;
+    public:
+    PaladinBag(int phoenixdownI,int antidote)
     {
         firstNode=NULL;
         CountItems=0;
@@ -118,15 +129,17 @@ public:
             firstNode = newNode;
             this->CountItems++;
         }
-    };
-    virtual bool insertFirst(BaseItem * item)=0;
-    virtual BaseItem * get(ItemType itemType)=0;
-    virtual string toString() const=0;
-    virtual ListNode * iterator()
+        cout<<firstNode;
+    }
+    bool insertFirst(BaseItem*);
+    BaseItem * get(ItemType );
+    string toString() const;
+    ListNode * iterator()
     {
         return firstNode;
     }
-    virtual void Drop3items()
+    BaseItem * getItem(BaseKnight* knight);
+    void Drop3items()
     {
         int i=1;
         while(i<=3)
@@ -135,53 +148,53 @@ public:
             if (firstNode==NULL) break;
             i++;
         }
-    };
-    virtual BaseItem * getItem(BaseKnight* knight)
-    { 
-        ListNode* curNode = firstNode;
-        while (curNode != NULL) 
-        {
-            if ((curNode->item->getItem()==PHOENIXDOWN)&&(curNode->item->canUse(knight)))
-            {
-                BaseItem *item= curNode->item; 
-                curNode->item=firstNode->item;
-                firstNode=firstNode->nextNode;
-                CountItems--;
-                return item;
-            }
-            curNode = curNode->nextNode;
-        }
-        return NULL;
-    };
-    virtual int getNumberofItems()
-    {
-        return CountItems;
-    };
-    virtual int getLimit()
-    {
-        return Limit;
-    };
-};
-class PaladinBag:public BaseBag
-{
-    public:
-    PaladinBag(int phoenixdownI,int antidote);
-    bool insertFirst(BaseItem*);
-    BaseItem * get(ItemType );
-    string toString() const;
-    BaseItem * getItem(BaseKnight* knight);
+    }
 };
 class LancelotBag:public BaseBag
 {
+    private:
+    ListNode* firstNode;
+    int CountItems;
     public:
     LancelotBag(int phoenixdownI,int antidote)
     {
-        
+        firstNode=NULL;
+        CountItems=0;
+        for(int i=1;i<=phoenixdownI;i++)
+        {            
+            ListNode* newNode = new ListNode();
+            newNode->nextNode = firstNode;
+            newNode->item=new PhoenixdownI(PHOENIXDOWN);
+            firstNode = newNode;
+            this->CountItems++;
+        }
+        for(int i=1;i<=antidote;i++)
+        {
+            ListNode* newNode = new ListNode();
+            newNode->nextNode = firstNode;
+            newNode->item=new Antidote(ANTIDOTE);
+            firstNode = newNode;
+            this->CountItems++;
+        }
     }
     bool insertFirst(BaseItem *);
     BaseItem * get(ItemType);
     string toString() const;
     BaseItem * getItem(BaseKnight* knight);
+    ListNode * iterator()
+    {
+        return firstNode;
+    }
+    void Drop3items()
+    {
+        int i=1;
+        while(i<=3)
+        {
+            firstNode=firstNode->nextNode;
+            if (firstNode==NULL) break;
+            i++;
+        }
+    }
 };
 class DragonBag:public BaseBag
 {
@@ -189,15 +202,6 @@ class DragonBag:public BaseBag
     ListNode* firstNode;
     int CountItems;
     public:
-    int Limit=14;
-    int getLimit()
-    {
-        return Limit;
-    }
-    int getNumberofItems()
-    {
-        return CountItems;
-    }
     DragonBag(int phoenixdownI,int antidote)
     {
         CountItems=0;
@@ -207,6 +211,14 @@ class DragonBag:public BaseBag
             ListNode* newNode = new ListNode();
             newNode->nextNode = firstNode;
             newNode->item=new PhoenixdownI(PHOENIXDOWN);
+            firstNode = newNode;
+            this->CountItems++;
+        }
+        for(int i=1;i<=antidote;i++)
+        {
+            ListNode* newNode = new ListNode();
+            newNode->nextNode = firstNode;
+            newNode->item=new Antidote(ANTIDOTE);
             firstNode = newNode;
             this->CountItems++;
         }
@@ -236,15 +248,6 @@ class NormalBag:public BaseBag
     ListNode* firstNode;
     int CountItems;
     public:
-    int Limit=19;
-    int getLimit()
-    {
-        return Limit;
-    }
-    int getNumberofItems()
-    {
-        return CountItems;
-    }
     NormalBag(int phoenixdownI,int antidote)
     {
         CountItems=0;
@@ -623,7 +626,7 @@ class BaseKnight {
     bool army_excalibur;
     bool army_lancelotSpear;
     int army_loseUltimecia;
-    bool meetHades,meetOmegaWeapon;
+    bool meetHades;
     BaseKnight()
     {
     }
@@ -685,6 +688,7 @@ class BaseKnight {
     void setGil(int Gil)
     {
         gil=Gil;
+        if (Gil>999) gil=999;
     }
     void setHP(int HP)
     {
@@ -710,7 +714,7 @@ private:
 BaseKnight ** armyKnight;
 int N;
 bool PaladinShied,Excalibur,LancelotSpear,GuinevereHair;
-bool meetHades,meetOmegaWeapon;
+bool meetHades;
 public:
     ArmyKnights (const string & file_armyknights);
     ~ArmyKnights()
