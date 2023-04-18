@@ -3,6 +3,7 @@
 
 #include "main.h"
 
+
 // #define DEBUG
 enum ItemType {PHOENIXDOWN=0,ANTIDOTE};
 enum KnightType { PALADIN = 0, LANCELOT, DRAGON, NORMAL };

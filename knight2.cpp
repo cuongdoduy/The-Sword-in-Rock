@@ -2,6 +2,7 @@
 
 /* * * BEGIN implementation of class BaseBag * * */
 // Class PaladinBag
+
 bool PaladinBag::insertFirst(BaseItem * item)
 {
     ListNode* newNode = new ListNode();
