@@ -189,6 +189,7 @@ void Ultimecia::win(BaseKnight *knight)
 bool isPytago(int);
 bool isPrime(int);
 void passing(BaseKnight **,int );
+void CheckingBag(BaseKnight **arr,int N,BaseItem *items);
 KnightType checkingtype(int HP)
 {
     if (isPrime(HP)) return PALADIN;
@@ -215,9 +216,9 @@ string BaseKnight::toString() const {
         + "]";
     return s;
 }
-// /* * * END implementation of class BaseKnight * * */
+/* * * END implementation of class BaseKnight * * */
 
-// /* * * BEGIN implementation of class ArmyKnights * * */
+/* * * BEGIN implementation of class ArmyKnights * * */
 ArmyKnights::ArmyKnights(const string & file_armyknights)
 {
     PaladinShied=false;
@@ -240,20 +241,6 @@ ArmyKnights::ArmyKnights(const string & file_armyknights)
 BaseKnight* ArmyKnights::lastKnight() const
 {
     return armyKnight[N];
-}
-void CheckingBag(BaseKnight **arr,int N,BaseItem *items)
-{
-    while(N>=1)
-    {
-        if (arr[N]->getBag()->getNumberofItems()<arr[N]->getBag()->getLimit()) 
-        {
-            arr[N]->getBag()->insertFirst(items);
-            // cout<<N<<"-"<<arr[N]->getBag()->toString()<<endl;
-            return;
-            
-        }
-        else N--;
-    }
 }
 void ArmyKnights::sortArmyKnight()
 {
@@ -662,5 +649,19 @@ void passing(BaseKnight **arr,int N)
         arr[k]->setGil(arr[k]->getGil()+remainGil);
         remainGil=arr[k]->getGil()-999;
         if(k==1&&arr[1]->getGil()>999) arr[1]->setGil(999);
+    }
+}
+void CheckingBag(BaseKnight **arr,int N,BaseItem *items)
+{
+    while(N>=1)
+    {
+        if (arr[N]->getBag()->getNumberofItems()<arr[N]->getBag()->getLimit()) 
+        {
+            arr[N]->getBag()->insertFirst(items);
+            // cout<<N<<"-"<<arr[N]->getBag()->toString()<<endl;
+            return;
+            
+        }
+        else N--;
     }
 }
