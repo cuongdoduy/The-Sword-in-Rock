@@ -65,20 +65,6 @@ string PaladinBag::toString() const
 }
 BaseItem * PaladinBag::getItem(BaseKnight*knight)
 {
-    ListNode* curNode = firstNode;
-    while (curNode != NULL) 
-    {
-        if ((curNode->item->getItem()==PHOENIXDOWN)&&(curNode->item->canUse(knight)))
-        {
-            BaseItem *item= curNode->item; 
-            curNode->item=firstNode->item;
-            firstNode=firstNode->nextNode;
-            CountItems--;
-            return item;
-        }
-        curNode = curNode->nextNode;
-    }
-    return NULL;
 }
 
 // End of class PaladinBag
