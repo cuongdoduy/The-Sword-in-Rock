@@ -392,7 +392,6 @@ bool ArmyKnights::adventure (Events * events)
             case 114:
             {
                 BaseItem *item=new PhoenixdownIV(PHOENIXDOWN);
-                this->lastKnight()->getBag()->insertFirst(item);
                 CheckingBag(armyKnight,N,item);
                 break;
             }
@@ -414,8 +413,13 @@ bool ArmyKnights::adventure (Events * events)
                 if(this->lastKnight()->army_loseUltimecia==1) 
                 {
                     N=0;
+                    delete opponent;
                 }
-                else N--;
+                else
+                {
+                    delete armyKnight[N];
+                    N--;
+                }
             }  
             else 
             {
@@ -436,11 +440,13 @@ bool ArmyKnights::adventure (Events * events)
                             }
                         }                      
                         delete knight;      
-                    }            
+                    }           
+                    delete opponent; 
                     printInfo();
                     printResult(true);
                     return true;
                 }
+                delete opponent;
                 printInfo();
                 i++;
                 
@@ -448,6 +454,7 @@ bool ArmyKnights::adventure (Events * events)
         }
         else 
         {  
+            delete opponent;
             printInfo();
             i++;
         }
@@ -518,7 +525,8 @@ bool ArmyKnights::hasExcaliburSword() const
 {
     return Excalibur;
 }
-void ArmyKnights::printResult(bool win) const {
+void ArmyKnights::printResult(bool win) const 
+{
     cout << (win ? "WIN" : "LOSE") << endl;
 }
 /* * * END implementation of class ArmyKnights * * */
@@ -582,7 +590,7 @@ string PhoenixdownI::getName()
 bool PhoenixdownII::canUse(BaseKnight *knight)
 {
     int HP=knight->getHP();
-    if (HP<(knight->getmaxHP())/4)  return true; else return false;
+    if (HP<(int((knight->getmaxHP())/4)))  return true; else return false;
 }
 void PhoenixdownII::use(BaseKnight *knight)
 {
@@ -595,12 +603,12 @@ string PhoenixdownII::getName()
 bool PhoenixdownIII::canUse(BaseKnight *knight)
 {
     int HP=knight->getHP();
-    if (HP<(knight->getmaxHP())/3) return true; else return false;
+    if (HP<(int(knight->getmaxHP())/3)) return true; else return false;
 }
 void PhoenixdownIII::use(BaseKnight *knight)
 {
     int HP=knight->getHP();
-    if (HP<=0) knight->setHP((knight->getmaxHP())/3); else knight->setHP(HP+(knight->getmaxHP())/3);
+    if (HP<=0) knight->setHP(int((knight->getmaxHP())/3)); else knight->setHP(HP+int((knight->getmaxHP())/4));
 }
 string PhoenixdownIII::getName()
 {
@@ -609,12 +617,12 @@ string PhoenixdownIII::getName()
 bool PhoenixdownIV::canUse(BaseKnight *knight)
 {
     int HP=knight->getHP();
-    if (HP<(knight->getmaxHP())/2) return true; else return false;
+    if (HP<(int(knight->getmaxHP()/2))) return true; else return false;
 }
 void PhoenixdownIV::use(BaseKnight *knight)
 {
     int HP=knight->getHP();
-    if (HP<=0) knight->setHP((knight->getmaxHP())/2); else knight->setHP(HP+(knight->getmaxHP())/5);
+    if (HP<=0) knight->setHP(int((knight->getmaxHP())/2)); else knight->setHP(HP+int((knight->getmaxHP())/5));
 }
 string PhoenixdownIV::getName()
 {
@@ -631,7 +639,7 @@ bool isPytago(int HP)
         int b=HP%10;
         HP=HP/10;
         int c=HP;
-        if ((a*a==b*c+c*c)||(b*b==a*a+c*c)||(c*c==a*a+b*b)) return true;
+        if (((a*a==b*b+c*c)||(b*b==a*a+c*c)||(c*c==a*a+b*b))&&(a>0&&b>0&&c>0)) return true;
     }
     return false;
 }
@@ -669,7 +677,6 @@ void CheckingBag(BaseKnight **arr,int N,BaseItem *items)
         if (arr[N]->getBag()->getNumberofItems()<arr[N]->getBag()->getLimit()) 
         {
             arr[N]->getBag()->insertFirst(items);
-            // cout<<N<<"-"<<arr[N]->getBag()->toString()<<endl;
             return;
             
         }
