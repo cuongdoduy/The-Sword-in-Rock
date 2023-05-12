@@ -288,7 +288,6 @@ bool ArmyKnights::adventure (Events * events)
         if (N==0)
         {
             printInfo();
-            printResult(false);
             return false;
         }
         if (prevState!=i)
@@ -412,13 +411,16 @@ bool ArmyKnights::adventure (Events * events)
             {
                 if(this->lastKnight()->army_loseUltimecia==1) 
                 {
-                    N=0;
-                    delete opponent;
+                    N=0;    
                 }
-                else
-                {
-                    delete armyKnight[N];
+                else 
+                {  
                     N--;
+                    if (IdEnemy!=99&&N!=0) 
+                    {
+                        printInfo();
+                        i++;
+                    }
                 }
             }  
             else 
@@ -440,26 +442,21 @@ bool ArmyKnights::adventure (Events * events)
                             }
                         }                      
                         delete knight;      
-                    }           
-                    delete opponent; 
+                    }            
                     printInfo();
-                    printResult(true);
                     return true;
                 }
-                delete opponent;
                 printInfo();
-                i++;
-                
+                i++; 
             }
         }
         else 
         {  
-            delete opponent;
             printInfo();
             i++;
         }
     }
-    return false;
+    return true;
 }
 bool ArmyKnights::fight(BaseOpponent* opponent)
 {
@@ -469,10 +466,12 @@ bool ArmyKnights::fight(BaseOpponent* opponent)
     this->lastKnight()->army_paladinShied=this->PaladinShied;
     this->lastKnight()->meetHades=this->meetHades;
     this->lastKnight()->meetOmegaWeapon=this->meetOmegaWeapon;
+    int HP=this->lastKnight()->getHP();
     opponent->fight(this->lastKnight());
-    this->recoveryLastKnight(this->lastKnight());
+    if(this->lastKnight()->getHP()<HP) this->recoveryLastKnight(this->lastKnight());
     if (this->lastKnight()->getHP()<=0||this->lastKnight()->lose==true) return true; else
     {
+        
         if(this->lastKnight()->getGil()>999) passing(armyKnight,N);
         this->Excalibur=this->lastKnight()->army_excalibur;
         this->GuinevereHair=this->lastKnight()->army_guinevererHair;
@@ -525,8 +524,7 @@ bool ArmyKnights::hasExcaliburSword() const
 {
     return Excalibur;
 }
-void ArmyKnights::printResult(bool win) const 
-{
+void ArmyKnights::printResult(bool win) const {
     cout << (win ? "WIN" : "LOSE") << endl;
 }
 /* * * END implementation of class ArmyKnights * * */
@@ -548,6 +546,7 @@ void KnightAdventure::loadEvents(const string & file)
 void KnightAdventure::run()
 {
     bool z=armyKnights->adventure(events);
+    armyKnights->printResult(z);
 }
 /* * * END implementation of class KnightAdventure * * */
 
@@ -677,6 +676,7 @@ void CheckingBag(BaseKnight **arr,int N,BaseItem *items)
         if (arr[N]->getBag()->getNumberofItems()<arr[N]->getBag()->getLimit()) 
         {
             arr[N]->getBag()->insertFirst(items);
+            // cout<<N<<"-"<<arr[N]->getBag()->toString()<<endl;
             return;
             
         }

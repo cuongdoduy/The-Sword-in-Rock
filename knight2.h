@@ -152,6 +152,7 @@ public:
         {
             if (firstNode==NULL) break;
             firstNode=firstNode->nextNode;
+            this->CountItems--;
             i++;
         }
     };
@@ -320,6 +321,7 @@ class QueenOfCards:public BaseOpponent
 };
 class NinadeRings:public BaseOpponent
 {
+
     public:
     NinadeRings(int i,int IdEnemy)
     {
