@@ -1,5 +1,5 @@
 #include "knight2.h"
-#include <bits/stdc++.h>
+// #include <bits/stdc++.h>
 int main(int argc, char ** argv) {
     string file_armyknights, file_events;
     if (argc == 1) {
