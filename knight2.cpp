@@ -75,6 +75,7 @@ void Tornbery::win(BaseKnight *knight)
         knight->getBag()->Drop3items();
         knight->setHP(knight->getHP()-10);
     }
+    delete item;
 }
 // End of class Tornbery
 void QueenOfCards::fight(BaseKnight * knight)
@@ -273,9 +274,8 @@ void ArmyKnights::sortArmyKnight()
     for(int i=N;i>=1;i--)
     {
         armyKnight[i]=newArmy[i];
-        // cout<<armyKnight[i]->toString()<<endl;
     }   
-    delete newArmy;
+    delete [] newArmy;
 }
 bool ArmyKnights::adventure (Events * events)
 {
@@ -288,7 +288,6 @@ bool ArmyKnights::adventure (Events * events)
         if (N==0)
         {
             printInfo();
-            printResult(false);
             return false;
         }
         if (prevState!=i)
@@ -412,13 +411,23 @@ bool ArmyKnights::adventure (Events * events)
             {
                 if(this->lastKnight()->army_loseUltimecia==1) 
                 {
-                    N=0;
                     delete opponent;
+                    while(N!=0)
+                    {
+                        delete armyKnight[N];
+                        N--;
+                    }                       
                 }
-                else
-                {
+                else 
+                {  
                     delete armyKnight[N];
                     N--;
+                    if (IdEnemy!=99&&N!=0) 
+                    {
+                        printInfo();
+                        delete opponent;
+                        i++;
+                    }
                 }
             }  
             else 
@@ -438,28 +447,25 @@ bool ArmyKnights::adventure (Events * events)
                                     armyKnight[j]=knight;
                                 }
                             }
-                        }                      
-                        delete knight;      
-                    }           
-                    delete opponent; 
+                        }    
+                                    
+                    }            
                     printInfo();
-                    printResult(true);
+                    delete opponent;
                     return true;
                 }
                 delete opponent;
                 printInfo();
-                i++;
-                
+                i++; 
             }
         }
         else 
         {  
-            delete opponent;
             printInfo();
             i++;
         }
     }
-    return false;
+    return true;
 }
 bool ArmyKnights::fight(BaseOpponent* opponent)
 {
@@ -469,10 +475,12 @@ bool ArmyKnights::fight(BaseOpponent* opponent)
     this->lastKnight()->army_paladinShied=this->PaladinShied;
     this->lastKnight()->meetHades=this->meetHades;
     this->lastKnight()->meetOmegaWeapon=this->meetOmegaWeapon;
+    int HP=this->lastKnight()->getHP();
     opponent->fight(this->lastKnight());
-    this->recoveryLastKnight(this->lastKnight());
+    if(this->lastKnight()->getHP()<HP) this->recoveryLastKnight(this->lastKnight());
     if (this->lastKnight()->getHP()<=0||this->lastKnight()->lose==true) return true; else
     {
+        
         if(this->lastKnight()->getGil()>999) passing(armyKnight,N);
         this->Excalibur=this->lastKnight()->army_excalibur;
         this->GuinevereHair=this->lastKnight()->army_guinevererHair;
@@ -495,6 +503,7 @@ void ArmyKnights::recoveryLastKnight(BaseKnight* knight)
             knight->setGil(knight->getGil()-100);
             knight->setHP(knight->getmaxHP()/2);
     }
+    delete item;
 }
 void ArmyKnights::printInfo() const {
     cout << "No. knights: " << this->count();
@@ -525,8 +534,7 @@ bool ArmyKnights::hasExcaliburSword() const
 {
     return Excalibur;
 }
-void ArmyKnights::printResult(bool win) const 
-{
+void ArmyKnights::printResult(bool win) const {
     cout << (win ? "WIN" : "LOSE") << endl;
 }
 /* * * END implementation of class ArmyKnights * * */
@@ -548,6 +556,12 @@ void KnightAdventure::loadEvents(const string & file)
 void KnightAdventure::run()
 {
     bool z=armyKnights->adventure(events);
+    armyKnights->printResult(z);
+    while(armyKnights->count()!=0)
+    {
+        delete armyKnights->lastKnight();
+        armyKnights->setN(armyKnights->count()-1);
+    }
 }
 /* * * END implementation of class KnightAdventure * * */
 

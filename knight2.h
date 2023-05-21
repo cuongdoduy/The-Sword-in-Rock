@@ -104,7 +104,7 @@ public:
         CountItems=0;
         for(int i=1;i<=phoenixdownI;i++)
         {            
-            ListNode* newNode = new ListNode();
+            ListNode* newNode=new ListNode();
             newNode->nextNode = firstNode;
             newNode->item=new PhoenixdownI(PHOENIXDOWN);
             firstNode = newNode;
@@ -112,7 +112,7 @@ public:
         }
         for(int i=1;i<=antidote;i++)
         {
-            ListNode* newNode = new ListNode();
+            ListNode* newNode=new ListNode();
             newNode->nextNode = firstNode;
             newNode->item=new Antidote(ANTIDOTE);
             firstNode = newNode;
@@ -150,8 +150,12 @@ public:
         int i=1;
         while(i<=3)
         {
-            if (firstNode==NULL) break;
-            firstNode=firstNode->nextNode;
+            if(firstNode==NULL) break;
+            ListNode* temp = firstNode;
+            firstNode = firstNode->nextNode;
+            delete temp->item;
+            delete temp;
+            this->CountItems--;
             i++;
         }
     };
@@ -164,7 +168,9 @@ public:
             {
                 BaseItem *item= curNode->item; 
                 curNode->item=firstNode->item;
+                ListNode* temp = firstNode;
                 firstNode=firstNode->nextNode;
+                delete temp;
                 CountItems--;
                 return item;
             }
@@ -187,16 +193,28 @@ public:
         {
             if (curNode->item->getItem()==type)
             {
-                
                 BaseItem *item= curNode->item; 
                 curNode->item=firstNode->item;
+                ListNode* temp = firstNode;
                 firstNode=firstNode->nextNode;
+                delete temp;
                 CountItems--;
                 return item;
             }
             curNode = curNode->nextNode;
         }
         return NULL;
+    }
+    ~BaseBag()
+    {
+        ListNode* curNode = firstNode;
+        while (curNode != NULL) 
+        {
+            ListNode* temp = curNode;
+            curNode = curNode->nextNode;
+            delete temp->item;
+            delete temp;
+        }
     }
 };
 class PaladinBag:public BaseBag
@@ -320,6 +338,7 @@ class QueenOfCards:public BaseOpponent
 };
 class NinadeRings:public BaseOpponent
 {
+
     public:
     NinadeRings(int i,int IdEnemy)
     {
@@ -446,11 +465,11 @@ class BaseKnight {
     }
     void setGil(int Gil)
     {
-        gil=Gil;
+        this->gil=Gil;
     }
     void setHP(int HP)
     {
-        hp=HP;
+        this->hp=HP;
         if (HP>=999) hp=999;
     }
     void setLevel(int level)
@@ -466,6 +485,10 @@ class BaseKnight {
     {
         return bag;
     } 
+    ~BaseKnight()
+    {
+        delete bag;
+    }
 };
 class ArmyKnights {
 private:
@@ -478,13 +501,17 @@ public:
     ArmyKnights (const string & file_armyknights);
     ~ArmyKnights()
     {
-        delete armyKnight;
+        delete[] armyKnight;
     }
     bool fight(BaseOpponent * opponent);
     bool adventure (Events * events);
     int count() const
     {
         return N;
+    }
+    void setN(int N)
+    {
+        this->N=N;
     }
     BaseKnight * lastKnight() const;
     bool hasPaladinShield() const;
@@ -508,7 +535,7 @@ public:
     Events ( const string &);
     ~Events()
     {
-        delete arr;
+        delete[] arr;
     }
     int count() const;
     int get(int i) const;
